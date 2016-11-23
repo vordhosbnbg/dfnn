@@ -1,1 +1,1 @@
-# dfnn
+# Dynamic Fast Neural Network
