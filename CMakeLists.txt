@@ -36,8 +36,8 @@ add_library (dfnn SHARED ${Project_SOURCES} ${External_SOURCES} )
 add_executable (dfnn_test ${Project_Test_SOURCES} )
 target_link_libraries(dfnn_test dfnn)
 
-set_property(TARGET dfnn PROPERTY CXX_STANDARD 11)
-set_property(TARGET dfnn_test PROPERTY CXX_STANDARD 11)
+set_property(TARGET dfnn PROPERTY CXX_STANDARD 14)
+set_property(TARGET dfnn_test PROPERTY CXX_STANDARD 14)
 find_package (Threads)
 target_link_libraries (dfnn ${CMAKE_THREAD_LIBS_INIT})
 
