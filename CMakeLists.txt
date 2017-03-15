@@ -6,6 +6,8 @@ file(GLOB_RECURSE Project_SOURCES "src/*.cpp")
 file(GLOB_RECURSE Project_HEADERS "inc/*.h")
 file(GLOB_RECURSE Project_Test_SOURCES "tst/*.cpp")
 file(GLOB_RECURSE Project_Test_HEADERS "tst/*.h")
+file(GLOB_RECURSE Project_Env_SOURCES "env/*.cpp")
+file(GLOB_RECURSE Project_Env_HEADERS "env/*.h")
 file(GLOB_RECURSE External_SOURCES "ext/*.cpp")
 file(GLOB_RECURSE External_HEADERS "ext/*.h")
 
@@ -34,10 +36,13 @@ include_directories(${Project_INCLUDE_DIRS})
 
 add_library (dfnn SHARED ${Project_SOURCES} ${External_SOURCES} )
 add_executable (dfnn_test ${Project_Test_SOURCES} )
+add_executable (dfnn_env ${Project_Env_SOURCES} )
 target_link_libraries(dfnn_test dfnn)
+target_link_libraries(dfnn_env dfnn)
 
 set_property(TARGET dfnn PROPERTY CXX_STANDARD 14)
 set_property(TARGET dfnn_test PROPERTY CXX_STANDARD 14)
+set_property(TARGET dfnn_env PROPERTY CXX_STANDARD 14)
 find_package (Threads)
 target_link_libraries (dfnn ${CMAKE_THREAD_LIBS_INIT})
 

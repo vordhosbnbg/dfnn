@@ -25,13 +25,30 @@ public:
         return *_mapNeurons.at(ID);
     }
 
+    bool existsNeuron(Handle ID)
+    {
+        return(_mapNeurons.find(ID) != _mapNeurons.end());
+    }
+    bool removeNeuron(Handle ID)
+    {
+        bool retVal = false;
+        NeuronMapByID::iterator mapIt = _mapNeurons.find(ID);
+        if(mapIt != _mapNeurons.end())
+        {
+            _mapNeurons.erase(mapIt);
+            retVal = true;
+        }
+
+        return retVal;
+    }
+
     Neuron& modifyNeuron(Handle ID)
     {
         return *_mapNeurons.at(ID);
     }
 
-    void PumpNetwork();
-    void DbgPrint() const;
+    void pumpNetwork();
+    void dbgPrint() const;
 
 
 

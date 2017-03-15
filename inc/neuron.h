@@ -3,6 +3,7 @@
 #include <memory>
 #include <utility>
 #include <iostream>
+#include "joelcolors.h"
 
 class Neuron;
 
@@ -87,7 +88,16 @@ public:
 
     void DbgPrint() const
     {
-        std::cout << "N["<< _index << "](" << _outputs.size() << "){" <<  std::hex << _id << "}\n"
+        Color::Modifier def(Color::FG_DEFAULT);
+        Color::Modifier yel(Color::FG_YELLOW);
+        Color::Modifier red(Color::FG_RED);
+        Color::Modifier blu(Color::FG_BLUE);
+        Color::Modifier grn(Color::FG_GREEN);
+
+        std::cout << def << "N[" << def << _index
+                  << def << "](" << def << _outputs.size()
+                  << def << "){" <<  std::hex << _id
+                  << def << "}\n"
                   << "outputs: \n";
 
         for(const Connection& conn : _outputs)

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "dfnn.h"
 #include "neuron.h"
+#include "joelcolors.h"
 
 Handle DFNN::createNeuron()
 {
@@ -14,7 +15,7 @@ Handle DFNN::createNeuron()
 }
 
 
-void DFNN::PumpNetwork()
+void DFNN::pumpNetwork()
 {
     #pragma omp parallel for
     for(std::unique_ptr<Neuron>& neuron : _vecNeurons)
@@ -24,9 +25,12 @@ void DFNN::PumpNetwork()
     }
 }
 
-void DFNN::DbgPrint() const
+void DFNN::dbgPrint() const
 {
-    std::cout << "DFNN with " << _vecNeurons.size() << " neurons.\n";
+    Color::Modifier yellow(Color::FG_YELLOW);
+    Color::Modifier def(Color::FG_DEFAULT);
+
+    std::cout << "DFNN with " << yellow << _vecNeurons.size() << def << " neurons.\n";
     for(const std::unique_ptr<Neuron>& neuron : _vecNeurons)
     {
         neuron->DbgPrint();

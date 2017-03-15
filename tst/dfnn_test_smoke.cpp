@@ -22,8 +22,8 @@ int main(int argc, char **argv)
     n5.ConnectOutput(1.0, n3);
     n1.AccumulateCharge(5.0);
     n2.AccumulateCharge(10.0);
-    network.PumpNetwork();
-    network.PumpNetwork();
-    network.DbgPrint();
+    network.pumpNetwork();
+    network.pumpNetwork();
+    network.dbgPrint();
     return 0;
 }
