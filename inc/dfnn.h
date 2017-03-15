@@ -7,8 +7,8 @@
 #include "neuron.h"
 #include "random_id_generator.h"
 
-using NeuronVector = std::vector<Neuron>;
-using NeuronMapByID = std::map<NeuronHandle, Neuron*>;
+using NeuronVector = std::vector<std::unique_ptr<Neuron>>;
+using NeuronMapByID = std::map<NeuronHandle, Neuron *>;
 
 class DFNN : public RandomIdGenerator
 {
@@ -17,6 +17,8 @@ public:
     {
     }
     ~DFNN(){}
+
+    NeuronHandle createNeuron();
 
     const Neuron& getNeuron(NeuronHandle ID) const
     {
@@ -28,14 +30,8 @@ public:
         return *_mapNeurons.at(ID);
     }
 
-    NeuronHandle createNeuron()
-    {
-        _vecNeurons.emplace_back();
-        NeuronHandle id = getNewID(_mapNeurons);
-        _vecNeurons.back().setID(id);
-        _vecNeurons.back().setIndex(_vecNeurons.size() - 1);
-        _mapNeurons[id] = &_vecNeurons.back();
-    }
+    void PumpNetwork();
+    void DbgPrint() const;
 
 
 
