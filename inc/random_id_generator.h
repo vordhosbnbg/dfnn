@@ -1,10 +1,8 @@
 #pragma once
 #include <memory>
 #include <random>
-#include "neuron.h"
 
-using UniformDistributionNeuronHandles = std::uniform_int_distribution<NeuronHandle>;
-
+using Handle = int;
 
 class RandomIdGenerator
 {
@@ -17,9 +15,9 @@ public:
 
 protected:
     template<class MapT>
-    NeuronHandle getNewID(const MapT& keyMap)
+    Handle getNewID(const MapT& keyMap)
     {
-        NeuronHandle candidate;
+        Handle candidate;
         do
         {
             candidate = _uniform_dist(_engRandom);
@@ -31,6 +29,6 @@ protected:
 private:
     std::random_device _rnd;
     std::mt19937_64 _engRandom;
-    UniformDistributionNeuronHandles _uniform_dist;
+    std::uniform_int_distribution<Handle> _uniform_dist;
 
 };

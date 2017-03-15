@@ -1,11 +1,12 @@
-#include "dfnn.h"
 #include <iostream>
+#include "dfnn.h"
+#include "neuron.h"
 
-NeuronHandle DFNN::createNeuron()
+Handle DFNN::createNeuron()
 {
     _vecNeurons.emplace_back(std::make_unique<Neuron>());
     Neuron& newNeuron = *_vecNeurons.back().get();
-    NeuronHandle id = getNewID(_mapNeurons);
+    Handle id = getNewID(_mapNeurons);
     newNeuron.setID(id);
     newNeuron.setIndex(_vecNeurons.size() - 1);
     _mapNeurons[id] = &newNeuron;

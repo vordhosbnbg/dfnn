@@ -1,13 +1,14 @@
 #include "dfnn.h"
+#include "neuron.h"
 
 int main(int argc, char **argv)
 {
     DFNN network;
-    NeuronHandle l1n1 = network.createNeuron();
-    NeuronHandle l1n2 = network.createNeuron();
-    NeuronHandle l2n1 = network.createNeuron();
-    NeuronHandle l3n1 = network.createNeuron();
-    NeuronHandle l3n2 = network.createNeuron();
+    Handle l1n1 = network.createNeuron();
+    Handle l1n2 = network.createNeuron();
+    Handle l2n1 = network.createNeuron();
+    Handle l3n1 = network.createNeuron();
+    Handle l3n2 = network.createNeuron();
 
     Neuron& n1 = network.modifyNeuron(l1n1);
     Neuron& n2 = network.modifyNeuron(l1n2);
