@@ -153,8 +153,8 @@ void ConnectNeuron()
                     {
                         if(networkPtr->existsNeuron(id2))
                         {
-                            Neuron& n1 = networkPtr->modifyNeuron(id1);
-                            Neuron& n2 = networkPtr->modifyNeuron(id2);
+                            Neuron& n1 = networkPtr->getNeuron(id1);
+                            Neuron& n2 = networkPtr->getNeuron(id2);
                             n1.ConnectOutput(bias, n2);
                             std::cout << blue << "Neuron " << green << std::hex << id1 << blue << " is now connected to "
                                       << green << std::hex << id2 << def<< std::endl;
@@ -207,7 +207,7 @@ void AccumulateCharge()
             {
                 if(networkPtr->existsNeuron(id))
                 {
-                    Neuron& n1 = networkPtr->modifyNeuron(id);
+                    Neuron& n1 = networkPtr->getNeuron(id);
                     n1.AccumulateCharge(charge);
                     std::cout << yellow << charge << blue << " added to neuron " << green << std::hex << id
                               << blue << ". It now has " << yellow << n1.getAccumulator() << def << std::endl;

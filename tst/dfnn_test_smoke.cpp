@@ -10,11 +10,11 @@ int main(int argc, char **argv)
     Handle l3n1 = network.createNeuron();
     Handle l3n2 = network.createNeuron();
 
-    Neuron& n1 = network.modifyNeuron(l1n1);
-    Neuron& n2 = network.modifyNeuron(l1n2);
-    Neuron& n3 = network.modifyNeuron(l2n1);
-    Neuron& n4 = network.modifyNeuron(l3n1);
-    Neuron& n5 = network.modifyNeuron(l3n2);
+    Neuron& n1 = network.getNeuron(l1n1);
+    Neuron& n2 = network.getNeuron(l1n2);
+    Neuron& n3 = network.getNeuron(l2n1);
+    Neuron& n4 = network.getNeuron(l3n1);
+    Neuron& n5 = network.getNeuron(l3n2);
     n1.ConnectOutput(0.3, n3);
     n2.ConnectOutput(0.2, n3);
     n3.ConnectOutput(1.0, n4);
