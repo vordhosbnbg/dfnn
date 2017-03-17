@@ -27,7 +27,7 @@ public:
         _id = id;
     }
 
-    NeuronHandle getID()
+    NeuronHandle getID() const
     {
         return _id;
     }
@@ -37,7 +37,7 @@ public:
         _index = index;
     }
 
-    size_t getIndex()
+    size_t getIndex() const
     {
         return _index;
     }
@@ -58,54 +58,13 @@ public:
         _accumulator += chargeAmmount;
     }
 
-    void Discharge()
+    double getAccumulator() const
     {
-        if(_outputs.size())
-        {
-            double biasSum = 0.0;
-            for(Connection& outputConn : _outputs)
-            {
-                biasSum += outputConn.first;
-            }
-
-            if(biasSum != 0.0)
-            {
-                for(Connection& outputConn : _outputs)  // normalize bias
-                {
-                    outputConn.first /= biasSum;
-                }
-            }
-
-            for(Connection& outputConn : _outputs) // apply current charge, using bias
-            {
-                double bias = outputConn.first;
-                Neuron& output = *outputConn.second;
-                output.AccumulateCharge(bias * _charge);
-            }
-            _charge = 0.0;
-        }
+        return _accumulator;
     }
 
-    void DbgPrint() const
-    {
-        Color::Modifier def(Color::FG_DEFAULT);
-        Color::Modifier yel(Color::FG_YELLOW);
-        Color::Modifier red(Color::FG_RED);
-        Color::Modifier blu(Color::FG_BLUE);
-        Color::Modifier grn(Color::FG_GREEN);
-
-        std::cout << def << "N[" << def << _index
-                  << def << "](" << def << _outputs.size()
-                  << def << "){" <<  std::hex << _id
-                  << def << "}\n"
-                  << "outputs: \n";
-
-        for(const Connection& conn : _outputs)
-        {
-            std::cout << "\t[" << conn.first << "] --> " << std::hex << conn.second->getID() << "\n";
-        }
-        std::cout << "Acc: " << _accumulator <<  "; Charge: " << _charge << "\n";
-    }
+    void Discharge();
+    void DbgPrint() const;
 
 private:
 

@@ -1,7 +1,8 @@
 #include "dfnn.h"
 #include "neuron.h"
-#include <map>
+#include <unordered_map>
 #include <sstream>
+#include "joelcolors.h"
 
 enum class Command
 {
@@ -23,7 +24,13 @@ enum class Status
     NOK,
 };
 
-using StringToCommandMap = std::map<std::string,Command>;
+Color::Modifier blue(Color::FG_LIGHT_BLUE);
+Color::Modifier red(Color::FG_RED);
+Color::Modifier green(Color::FG_GREEN);
+Color::Modifier yellow(Color::FG_LIGHT_YELLOW);
+Color::Modifier def(Color::FG_DEFAULT);
+
+using StringToCommandMap = std::unordered_map<std::string,Command>;
 StringToCommandMap commandMap =
 {
     {"quit", Command::Quit},
@@ -43,11 +50,31 @@ void CreateNetwork()
 {
     if(networkPtr != nullptr)
     {
-        std::cout << "Destroying current network..." << std::endl;
+        std::cout << yellow << "Destroying current network..." << def << std::endl;
         networkPtr.release();
     }
-    std::cout << "Creating new empty network" << std::endl;
+    std::cout << blue <<"Creating new empty network" << def << std::endl;
     networkPtr = std::make_unique<DFNN>();
+}
+
+void ErrNoNetwork()
+{
+    std::cout << yellow << "No network. Please create a network first with cnet command." << def << std::endl;
+}
+
+void ErrNeuronNotFound(Handle id)
+{
+    std::cout << yellow << "No neuron with ID " << green << std::hex << id << yellow << " in the network." << def << std::endl;
+}
+
+void ErrNotHex(const std::string& input)
+{
+    std::cout << yellow << "Expected a hex number, not \'" <<  def << input << yellow << "\'" << def << std::endl;
+}
+
+void ErrNotNumber(const std::string& input)
+{
+    std::cout << yellow << "Expected a number, not \'" <<  def << input << yellow << "\'" << def << std::endl;
 }
 
 void CreateNeuron()
@@ -55,13 +82,14 @@ void CreateNeuron()
     if(networkPtr != nullptr)
     {
         Handle hNrn = networkPtr->createNeuron();
-        std::cout << "Created neuron with id = " << std::hex << hNrn << std::endl;
+        std::cout << blue << "Created neuron with id =" << green << " "<< std::hex << hNrn << def << std::endl;
     }
     else
     {
-        std::cout << "No network. Please create a network first with cnet command." << std::endl;
+        ErrNoNetwork();
     }
 }
+
 void RemoveNeuron()
 {
     if(networkPtr != nullptr)
@@ -72,27 +100,28 @@ void RemoveNeuron()
         Handle id = 0;
         std::stringstream converter(input);
         converter >> std::hex >> id;
-        if(converter.fail())
-        {
-            std::cout << "Not a hex number." << std::endl;
-        }
-        else
+        if(!converter.fail())
         {
             if(networkPtr->removeNeuron(id))
             {
-                std::cout << "Removed neuron with ID " << std::hex << id << std::endl;
+                std::cout << blue << "Removed neuron with ID " << green << std::hex << id << def << std::endl;
             }
             else
             {
-                std::cout << "No neuron with this ID in the network." << std::endl;
+                ErrNeuronNotFound(id);
             }
         }
-}
+        else
+        {
+            ErrNotNumber(input);
+        }
+    }
     else
     {
-        std::cout << "No network. Please create a network first with cnet command." << std::endl;
+        ErrNoNetwork();
     }
 }
+
 void ConnectNeuron()
 {
     if(networkPtr != nullptr)
@@ -127,45 +156,80 @@ void ConnectNeuron()
                             Neuron& n1 = networkPtr->modifyNeuron(id1);
                             Neuron& n2 = networkPtr->modifyNeuron(id2);
                             n1.ConnectOutput(bias, n2);
-                            std::cout << "Neuron " << std::hex << id1 << " is now connected to "
-                                      << std::hex << id2 << std::endl;
+                            std::cout << blue << "Neuron " << green << std::hex << id1 << blue << " is now connected to "
+                                      << green << std::hex << id2 << def<< std::endl;
                         }
                         else
                         {
-                            std::cout << "Target neuron with ID " << std::hex << id2 << " not found in network." << std::endl;
+                            ErrNeuronNotFound(id2);
                         }
                     }
                     else
                     {
-                        std::cout << "Source neuron with ID " << std::hex << id1 << " not found in network." << std::endl;
+                        ErrNeuronNotFound(id1);
                     }
                 }
                 else
                 {
-                    std::cout << "Not a valid ID (" << input << ")" << std::endl;
+                    ErrNotHex(input);
                 }
             }
             else
             {
-                std::cout << "Not a valid ID (" << input << ")" << std::endl;
+                ErrNotHex(input);
             }
         }
     }
     else
     {
-        std::cout << "No network. Please create a network first with cnet command." << std::endl;
+        ErrNoNetwork();
     }
 }
+
 void AccumulateCharge()
 {
     if(networkPtr != nullptr)
     {
-        Handle hNrn = networkPtr->createNeuron();
-        std::cout << "Created neuron with id = " << std::hex << hNrn << std::endl;
+        std::string input;
+        std::cin >> input;
+        Handle id = 0u;
+        std::stringstream converter(input);
+        converter >> std::hex >> id;
+        if(!converter.fail())
+        {
+            double charge;
+            std::cin >> input;
+            converter.str("");
+            converter.clear();
+            converter << input;
+            converter >> charge;
+            if(!converter.fail())
+            {
+                if(networkPtr->existsNeuron(id))
+                {
+                    Neuron& n1 = networkPtr->modifyNeuron(id);
+                    n1.AccumulateCharge(charge);
+                    std::cout << yellow << charge << blue << " added to neuron " << green << std::hex << id
+                              << blue << ". It now has " << yellow << n1.getAccumulator() << def << std::endl;
+                }
+                else
+                {
+                    ErrNeuronNotFound(id);
+                }
+            }
+            else
+            {
+                ErrNotNumber(input);
+            }
+        }
+        else
+        {
+            ErrNeuronNotFound(id);
+        }
     }
     else
     {
-        std::cout << "No network. Please create a network first with cnet command." << std::endl;
+        ErrNoNetwork();
     }
 }
 void PumpNetwork()
@@ -173,11 +237,11 @@ void PumpNetwork()
     if(networkPtr != nullptr)
     {
         networkPtr->pumpNetwork();
-        std::cout << "Pumped signals across connections." << std::endl;
+        std::cout << blue << "Pumped signals across connections." << def << std::endl;
     }
     else
     {
-        std::cout << "No network. Please create a network first with cnet command." << std::endl;
+        ErrNoNetwork();
     }
 }
 void PrintNetwork()
@@ -188,27 +252,27 @@ void PrintNetwork()
     }
     else
     {
-        std::cout << "No network. Please create a network first with cnet command." << std::endl;
+        ErrNoNetwork();
     }
 }
 
 void SyntaxError()
 {
-    std::cout << "Bad command" << std::endl;
+    std::cout << red << "Bad command" << def << std::endl;
 }
 
 void Help()
 {
     std::cout << "Commands are:\n"
-              << "quit\n"
-              << "cnet\n"
-              << "cnod\n"
-              << "rnod\n"
-              << "conn bias sourceID targetID\n"
-              << "accc ammount\n"
-              << "pump\n"
-              << "prnt\n"
-              << "help\n"
+              << def << "quit                          " << blue << "# quits \n"
+              << def << "cnet                          " << blue << "# create a new network\n"
+              << def << "cnod                          " << blue << "# create a new neuron and get handle\n"
+              << def << "rnod ID                       " << blue << "# remove a neuron by ID\n"
+              << def << "conn bias srcID dstID         " << blue << "# connect two neurons with specified strength\n"
+              << def << "accc ID ammount               " << blue << "# accumulate charge in a neuron\n"
+              << def << "pump                          " << blue << "# pump signals across the network\n"
+              << def << "prnt                          " << blue << "# print the network and its nodes\n"
+              << def << "help                          " << blue << "# this\n" << def << " "
               << std::endl ;
 }
 
@@ -260,12 +324,20 @@ Status ParseAndExecuteCommand(const std::string& command)
     return Status::OK;
 }
 
+void Prompt()
+{
+    std::cout << def << "> ";
+}
+
 int main(int argc, char **argv)
 {
     std::string input;
+    Help();
+    Prompt();
     std::cin >> input;
     while(ParseAndExecuteCommand(input) != Status::NOK)
     {
+        Prompt();
         std::cin >> input;
     }
     return 0;

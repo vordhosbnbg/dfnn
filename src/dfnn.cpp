@@ -5,36 +5,59 @@
 
 Handle DFNN::createNeuron()
 {
-    _vecNeurons.emplace_back(std::make_unique<Neuron>());
-    Neuron& newNeuron = *_vecNeurons.back().get();
+    _vecNeurons.emplace_back();
+    Neuron& newNeuron = _vecNeurons.back();
     Handle id = getNewID(_mapNeurons);
     newNeuron.setID(id);
     newNeuron.setIndex(_vecNeurons.size() - 1);
-    _mapNeurons[id] = &newNeuron;
+    RebuildMap();
     return id;
 }
 
+bool DFNN::removeNeuron(Handle ID)
+{
+    bool retVal = false;
+    for(const Neuron& neuron : _vecNeurons)
+    {
+        if(neuron.getID() == ID)
+        {
+            _vecNeurons.erase(_vecNeurons.begin() + neuron.getIndex());
+            RebuildMap();
+            retVal = true;
+            break;
+        }
+    }
+
+    return retVal;
+}
 
 void DFNN::pumpNetwork()
 {
     #pragma omp parallel for
-    for(std::unique_ptr<Neuron>& neuron : _vecNeurons)
+    for(Neuron& neuron : _vecNeurons)
     {
-        neuron->ChargeFromAccumulator();
-        neuron->Discharge();
+        neuron.Discharge();
+        neuron.ChargeFromAccumulator();
     }
 }
 
 void DFNN::dbgPrint() const
 {
-    Color::Modifier yellow(Color::FG_YELLOW);
-    Color::Modifier def(Color::FG_DEFAULT);
 
-    std::cout << "DFNN with " << yellow << _vecNeurons.size() << def << " neurons.\n";
-    for(const std::unique_ptr<Neuron>& neuron : _vecNeurons)
+    std::cout << "DFNN with " <<  _vecNeurons.size() << " neurons.\n";
+    for(const Neuron& neuron : _vecNeurons)
     {
-        neuron->DbgPrint();
+        neuron.DbgPrint();
         std::cout << "\n";
     }
     std::cout << std::endl;
+}
+
+void DFNN::RebuildMap()
+{
+    _mapNeurons.clear();
+    for(Neuron& neuron : _vecNeurons)
+    {
+        _mapNeurons.insert(std::make_pair(neuron.getID(), &neuron));
+    }
 }

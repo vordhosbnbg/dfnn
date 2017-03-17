@@ -7,7 +7,7 @@
 #include "random_id_generator.h"
 
 class Neuron;
-using NeuronVector = std::vector<std::unique_ptr<Neuron>>;
+using NeuronVector = std::vector<Neuron>;
 using NeuronMapByID = std::map<Handle, Neuron *>;
 
 class DFNN : public RandomIdGenerator
@@ -25,28 +25,16 @@ public:
         return *_mapNeurons.at(ID);
     }
 
-    bool existsNeuron(Handle ID)
-    {
-        return(_mapNeurons.find(ID) != _mapNeurons.end());
-    }
-    bool removeNeuron(Handle ID)
-    {
-        bool retVal = false;
-        NeuronMapByID::iterator mapIt = _mapNeurons.find(ID);
-        if(mapIt != _mapNeurons.end())
-        {
-            _mapNeurons.erase(mapIt);
-            retVal = true;
-        }
-
-        return retVal;
-    }
-
     Neuron& modifyNeuron(Handle ID)
     {
         return *_mapNeurons.at(ID);
     }
 
+    bool existsNeuron(Handle ID)
+    {
+        return(_mapNeurons.find(ID) != _mapNeurons.end());
+    }
+    bool removeNeuron(Handle ID);
     void pumpNetwork();
     void dbgPrint() const;
 
@@ -54,7 +42,7 @@ public:
 
 
 private:
-
+    void RebuildMap();
     NeuronVector _vecNeurons;
     NeuronMapByID _mapNeurons;
 };

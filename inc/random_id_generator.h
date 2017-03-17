@@ -2,7 +2,7 @@
 #include <memory>
 #include <random>
 
-using Handle = int;
+using Handle = unsigned int;
 
 class RandomIdGenerator
 {
