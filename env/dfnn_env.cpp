@@ -14,6 +14,12 @@ enum class Command
     AccumulateCharge,
     PumpNetwork,
     PrintNetwork,
+    CreateInput,
+    UpdateInput,
+    RemoveInput,
+    CreateOutput,
+    UpdateOutput,
+    RemoveOutput,
     SyntaxError,
     Help,
 };
@@ -41,21 +47,17 @@ StringToCommandMap commandMap =
     {"accc", Command::AccumulateCharge},
     {"pump", Command::PumpNetwork},
     {"prnt", Command::PrintNetwork},
+    {"cin", Command::CreateInput},
+    {"uin", Command::UpdateInput},
+    {"rin", Command::RemoveInput},
+    {"cout", Command::CreateOutput},
+    {"uout", Command::UpdateOutput},
+    {"rout", Command::RemoveOutput},
     {"help", Command::Help},
 };
 
 static std::unique_ptr<DFNN> networkPtr;
 
-void CreateNetwork()
-{
-    if(networkPtr != nullptr)
-    {
-        std::cout << yellow << "Destroying current network..." << def << std::endl;
-        networkPtr.release();
-    }
-    std::cout << blue <<"Creating new empty network" << def << std::endl;
-    networkPtr = std::make_unique<DFNN>();
-}
 
 void ErrNoNetwork()
 {
@@ -76,6 +78,50 @@ void ErrNotNumber(const std::string& input)
 {
     std::cout << yellow << "Expected a number, not \'" <<  def << input << yellow << "\'" << def << std::endl;
 }
+Handle TryParseHandle()
+{
+    std::string input;
+    std::cin >> input;
+    Handle id = 0;
+    std::stringstream converter(input);
+    converter >> std::hex >> id;
+    if(converter.fail())
+    {
+        ErrNotHex(input);
+        id = 0;
+    }
+    return id;
+}
+bool TryParseDouble(double& val)
+{
+    bool retVal = false;
+    std::string input;
+    std::cin >> input;
+    std::stringstream converter(input);
+    double dbl;
+    converter >> dbl;
+    if(!converter.fail())
+    {
+        val = dbl;
+        retVal = true;
+    }
+    else
+    {
+        ErrNotNumber(input);
+    }
+    return retVal;
+}
+
+void CreateNetwork()
+{
+    if(networkPtr != nullptr)
+    {
+        std::cout << yellow << "Destroying current network..." << def << std::endl;
+        networkPtr.release();
+    }
+    std::cout << blue <<"Creating new empty network" << def << std::endl;
+    networkPtr = std::make_unique<DFNN>();
+}
 
 void CreateNeuron()
 {
@@ -94,13 +140,8 @@ void RemoveNeuron()
 {
     if(networkPtr != nullptr)
     {
-        std::string input;
-        std::cout << "ID: ";
-        std::cin >> input;
-        Handle id = 0;
-        std::stringstream converter(input);
-        converter >> std::hex >> id;
-        if(!converter.fail())
+        Handle id = TryParseHandle();
+        if(id)
         {
             if(networkPtr->removeNeuron(id))
             {
@@ -110,10 +151,6 @@ void RemoveNeuron()
             {
                 ErrNeuronNotFound(id);
             }
-        }
-        else
-        {
-            ErrNotNumber(input);
         }
     }
     else
@@ -126,28 +163,14 @@ void ConnectNeuron()
 {
     if(networkPtr != nullptr)
     {
-        std::string input;
-        std::cin >> input;
-        Handle id1 = 0;
-        Handle id2 = 0;
-        double bias;
-        std::stringstream converter(input);
-        converter >> bias;
-        if(!converter.fail())
+        Handle id1 = TryParseHandle();
+        if(id1)
         {
-            std::cin >> input;
-            converter.str("");
-            converter.clear();
-            converter << input;
-            converter >> std::hex >> id1;
-            if(!converter.fail())
+            Handle id2 = TryParseHandle();
+            if(id2)
             {
-                std::cin >> input;
-                converter.str("");
-                converter.clear();
-                converter << input;
-                converter >> std::hex >> id2;
-                if(!converter.fail())
+                double bias;
+                if(TryParseDouble(bias))
                 {
                     if(networkPtr->existsNeuron(id1))
                     {
@@ -169,14 +192,6 @@ void ConnectNeuron()
                         ErrNeuronNotFound(id1);
                     }
                 }
-                else
-                {
-                    ErrNotHex(input);
-                }
-            }
-            else
-            {
-                ErrNotHex(input);
             }
         }
     }
@@ -256,6 +271,118 @@ void PrintNetwork()
     }
 }
 
+void NewInput()
+{
+    if(networkPtr != nullptr)
+    {
+        double min;
+        double max;
+        if(TryParseDouble(min))
+        {
+            if(TryParseDouble(max))
+            {
+                Handle in = networkPtr->createInput(min, max);
+                std::cout << blue << "Created input with id" << green << " "<< std::hex << in << def << std::endl;
+            }
+        }
+    }
+    else
+    {
+        ErrNoNetwork();
+    }
+}
+void UpdateInput()
+{
+    if(networkPtr != nullptr)
+    {
+        Handle id = TryParseHandle();
+        if(id)
+        {
+            double val;
+            if(TryParseDouble(val))
+            {
+                networkPtr->updateInput(id, val);
+                std::cout << blue << "Updated intput" << green << " " << std::hex << id << blue << " with value " << yellow << val << def << std::endl;
+            }
+        }
+    }
+    else
+    {
+        ErrNoNetwork();
+    }
+}
+void RemoveInput()
+{
+    if(networkPtr != nullptr)
+    {
+        Handle id = TryParseHandle();
+        if(id)
+        {
+            networkPtr->removeInput(id);
+            std::cout << blue << "Removed input with id" << green << " "<< std::hex << id << def << std::endl;
+        }
+    }
+    else
+    {
+        ErrNoNetwork();
+    }
+}
+void NewOutput()
+{
+    if(networkPtr != nullptr)
+    {
+        double min;
+        double max;
+        if(TryParseDouble(min))
+        {
+            if(TryParseDouble(max))
+            {
+                Handle id = networkPtr->createInput(min, max);
+                std::cout << blue << "Created output with id " << green << " "<< std::hex << id << def << std::endl;
+            }
+        }
+    }
+    else
+    {
+        ErrNoNetwork();
+    }
+}
+
+void UpdateOutput()
+{
+    if(networkPtr != nullptr)
+    {
+        Handle id = TryParseHandle();
+        if(id)
+        {
+            double val;
+            networkPtr->updateOutput(id, val);
+            std::cout << blue << "Output" << green << " " << std::hex << id << blue << " has value " << yellow << val << def << std::endl;
+        }
+    }
+    else
+    {
+        ErrNoNetwork();
+    }
+}
+void RemoveOutput()
+{
+    if(networkPtr != nullptr)
+    {
+        Handle id = TryParseHandle();
+        if(id)
+        {
+            networkPtr->removeInput(id);
+            std::cout << blue << "Removed output with id" << green << " "<< std::hex << id << def << std::endl;
+        }
+    }
+    else
+    {
+        ErrNoNetwork();
+    }
+}
+
+
 void SyntaxError()
 {
     std::cout << red << "Bad command" << def << std::endl;
@@ -268,10 +395,16 @@ void Help()
               << def << "cnet                          " << blue << "# create a new network\n"
               << def << "cnod                          " << blue << "# create a new neuron and get handle\n"
               << def << "rnod ID                       " << blue << "# remove a neuron by ID\n"
-              << def << "conn bias srcID dstID         " << blue << "# connect two neurons with specified strength\n"
+              << def << "conn srcID dstID bias         " << blue << "# connect two neurons with specified strength\n"
               << def << "accc ID ammount               " << blue << "# accumulate charge in a neuron\n"
               << def << "pump                          " << blue << "# pump signals across the network\n"
               << def << "prnt                          " << blue << "# print the network and its nodes\n"
+              << def << "cin min max                   " << blue << "# new input between min and max\n"
+              << def << "uin ID value                  " << blue << "# update input\n"
+              << def << "rin ID                        " << blue << "# remove input by ID\n"
+              << def << "cout min max                  " << blue << "# new output between min and max\n"
+              << def << "uout ID                       " << blue << "# show output value\n"
+              << def << "rout ID                       " << blue << "# remove output by ID\n"
               << def << "help                          " << blue << "# this\n" << def << " "
               << std::endl ;
 }
@@ -311,6 +444,24 @@ Status ParseAndExecuteCommand(const std::string& command)
             break;
         case Command::Help:
             Help();
+            break;
+        case Command::CreateInput:
+            NewInput();
+            break;
+        case Command::UpdateInput:
+            UpdateInput();
+            break;
+        case Command::RemoveInput:
+            RemoveInput();
+            break;
+        case Command::CreateOutput:
+            NewOutput();
+            break;
+        case Command::UpdateOutput:
+            UpdateOutput();
+            break;
+        case Command::RemoveOutput:
+            RemoveOutput();
             break;
         default:
             SyntaxError();

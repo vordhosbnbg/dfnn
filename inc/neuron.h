@@ -42,6 +42,13 @@ public:
         return _index;
     }
 
+    double getCharge()
+    {
+        double retVal = _charge;
+        _charge = 0.0;
+        return retVal;
+    }
+
     void ConnectOutput(double bias, Neuron& output)
     {
         _outputs.emplace_back(std::make_pair(bias,&output));

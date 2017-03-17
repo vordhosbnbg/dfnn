@@ -73,6 +73,7 @@ Handle DFNN::createInput(double min, double max)
 {
     Handle id = createNeuron();
     _mapInputs.insert(std::pair<Handle,NormalizedValue<double>>(id, NormalizedValue<double>(min,max)));
+    return id;
 }
 
 bool DFNN::updateInput(Handle id, double value)
@@ -82,6 +83,8 @@ bool DFNN::updateInput(Handle id, double value)
     {
         NormalizedValue<double>& nVal = _mapInputs.at(id);
         nVal.set(value);
+        Neuron& n1 = *_mapNeurons.at(id);
+        n1.AccumulateCharge(nVal.getNormalized());
         retVal = true;
     }
     return retVal;
@@ -103,6 +106,7 @@ Handle DFNN::createOutput(double min, double max)
 {
     Handle id = createNeuron();
     _mapOutputs.insert(std::pair<Handle,NormalizedValue<double>>(id, NormalizedValue<double>(min,max)));
+    return id;
 }
 
 bool DFNN::updateOutput(Handle id, double &value)
@@ -111,6 +115,8 @@ bool DFNN::updateOutput(Handle id, double &value)
     if(_mapOutputs.find(id) != _mapOutputs.end())
     {
         NormalizedValue<double>& nVal = _mapOutputs.at(id);
+        Neuron& n1 = *_mapNeurons.at(id);
+        nVal.setNormalized(n1.getCharge());
         value = nVal.get();
         retVal = true;
     }
