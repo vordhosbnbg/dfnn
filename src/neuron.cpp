@@ -28,9 +28,19 @@ void Neuron::Discharge()
     }
 }
 
-void Neuron::DbgPrint() const
+void Neuron::DbgPrint(bool input, bool output) const
 {
-    std::cout << "N[" << _index << "](" << _outputs.size() << "){" <<  std::hex << _id << "}\n" << "outputs: \n";
+    std::string type;
+    if(input)
+    {
+        type = "<input>";
+    }
+    if(output)
+    {
+        type = "<output>";
+    }
+    std::cout << "N[" << _index << "](" << _outputs.size() << "){" <<  std::hex << _id
+              << "} "<< type << "\n" << "connections: \n";
 
     for(const Connection& conn : _outputs)
     {

@@ -53,9 +53,9 @@ public:
         normalizedValue = val;
     }
 
-private:
     T minVal;
     T maxVal;
+private:
     const T rangeVal;
     const T reciprocalRangeVal;
     double normalizedValue;

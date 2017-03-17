@@ -47,8 +47,7 @@ public:
     bool updateOutput(Handle id, double& value);
     bool removeOutput(Handle id);
 
-    void dbgPrint() const;
-
+    void dbgPrint();
 
 
 

@@ -337,7 +337,7 @@ void NewOutput()
         {
             if(TryParseDouble(max))
             {
-                Handle id = networkPtr->createInput(min, max);
+                Handle id = networkPtr->createOutput(min, max);
                 std::cout << blue << "Created output with id " << green << " "<< std::hex << id << def << std::endl;
             }
         }

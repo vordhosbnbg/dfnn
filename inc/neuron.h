@@ -71,7 +71,7 @@ public:
     }
 
     void Discharge();
-    void DbgPrint() const;
+    void DbgPrint(bool input = false, bool output = false) const;
 
 private:
 

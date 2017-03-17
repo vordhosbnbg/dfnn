@@ -2,6 +2,7 @@
 #include "dfnn.h"
 #include "neuron.h"
 #include "joelcolors.h"
+#include "file_archive.h"
 
 Handle DFNN::createNeuron()
 {
@@ -46,16 +47,43 @@ void DFNN::pumpNetwork()
     {
         neuron.Discharge();
         neuron.ChargeFromAccumulator();
+        if(_mapOutputs.find(neuron.getID()) != _mapOutputs.end())
+        {
+            _mapOutputs.at(neuron.getID()).setNormalized(neuron.getCharge());
+        }
     }
 }
 
-void DFNN::dbgPrint() const
+void DFNN::dbgPrint()
 {
 
     std::cout << "DFNN with " <<  _vecNeurons.size() << " neurons.\n";
-    for(const Neuron& neuron : _vecNeurons)
+    for(Neuron& neuron : _vecNeurons)
     {
-        neuron.DbgPrint();
+        bool input = false;
+        bool output = false;
+        if(_mapInputs.find(neuron.getID()) != _mapInputs.end())
+        {
+            input = true;
+        }
+        if(_mapOutputs.find(neuron.getID()) != _mapOutputs.end())
+        {
+            output = true;
+        }
+
+        neuron.DbgPrint(input, output);
+        if(input)
+        {
+            NormalizedValue<double>& nVal = _mapInputs.at(neuron.getID());
+            std::cout << "InputValue(" << nVal.minVal << "," << nVal.maxVal
+                      << "): " << nVal.get() << " [" << nVal.get() << "]";
+        }
+        if(output)
+        {
+            NormalizedValue<double>& nVal = _mapOutputs.at(neuron.getID());
+            std::cout << "OutputValue(" << nVal.minVal << "," << nVal.maxVal
+                      << "): " << nVal.get() << " [" << nVal.get() << "]";
+        }
         std::cout << "\n";
     }
     std::cout << std::endl;
