@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "dfnn.h"
 #include "neuron.h"
 #include "joelcolors.h"
@@ -42,7 +43,6 @@ bool DFNN::removeNeuron(Handle id)
 
 void DFNN::pumpNetwork()
 {
-    #pragma omp parallel for
     for(Neuron& neuron : _vecNeurons)
     {
         neuron.Discharge();
@@ -75,14 +75,14 @@ void DFNN::dbgPrint()
         if(input)
         {
             NormalizedValue<double>& nVal = _mapInputs.at(neuron.getID());
-            std::cout << "InputValue(" << nVal.minVal << "," << nVal.maxVal
-                      << "): " << nVal.get() << " [" << nVal.get() << "]";
+            std::cout << "InputValue(" << nVal.getMin() << "," << nVal.getMax()
+                      << "): " << nVal.get() << " [" << nVal.getNormalized() << "]";
         }
         if(output)
         {
             NormalizedValue<double>& nVal = _mapOutputs.at(neuron.getID());
-            std::cout << "OutputValue(" << nVal.minVal << "," << nVal.maxVal
-                      << "): " << nVal.get() << " [" << nVal.get() << "]";
+            std::cout << "OutputValue(" << nVal.getMin() << "," << nVal.getMax()
+                      << "): " << nVal.get() << " [" << nVal.getNormalized() << "]";
         }
         std::cout << "\n";
     }
@@ -161,4 +161,40 @@ bool DFNN::removeOutput(Handle id)
         retVal = true;
     }
     return retVal;
+}
+
+std::string DFNN::save(Archive * ar)
+{
+    std::stringstream ss;
+    std::string ret;
+    ss << "DFNN " << _vecNeurons.size() << " " << _mapInputs.size() << " " << _mapOutputs.size() << "\n";
+    ret += ss.str();
+    ret += ar->save(_vecNeurons);
+    ret += ar->save(_mapInputs);
+    ret += ar->save(_mapOutputs);
+    return ret;
+}
+
+void DFNN::load(std::stringstream& ss, DFNN &obj, Archive * ar)
+{
+    size_t nbNeurons;
+    size_t nbInputs;
+    size_t nbOutputs;
+
+    std::string line;
+    std::getline(ss, line);
+    if(line.substr(0,5) == "DFNN ")
+    {
+        std::stringstream converter(line.substr(4));
+        converter >> nbNeurons >> nbInputs >> nbOutputs;
+        _vecNeurons.reserve(nbNeurons);
+        ar->load(ss, _vecNeurons, ar);
+        ar->load(ss, _mapInputs, ar);
+        ar->load(ss, _mapOutputs, ar);
+        rebuildMap();
+        for(Neuron& nrn : _vecNeurons)
+        {
+            nrn.reconstructPointers(this);
+        }
+    }
 }

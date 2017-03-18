@@ -6,7 +6,8 @@
 #include "joelcolors.h"
 
 class Neuron;
-
+class Archive;
+class DFNN;
 using NeuronHandle = unsigned int;
 using NeuronPtr = Neuron*;
 using Connection = std::pair<double, NeuronPtr>;
@@ -72,6 +73,9 @@ public:
 
     void Discharge();
     void DbgPrint(bool input = false, bool output = false) const;
+    std::string save(Archive *ar);
+    void load(std::stringstream& ss, Neuron& obj, Archive *ar);
+    void reconstructPointers(DFNN* parentNetwork);
 
 private:
 

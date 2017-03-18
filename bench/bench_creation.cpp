@@ -2,12 +2,12 @@
 #include "neuron.h"
 
 
-constexpr unsigned int nbNeurons = 2000;
+constexpr size_t nbNeurons = 2000;
 
 int main(int argc, char **argv)
 {
     DFNN network;
-    for(auto ind = 0; ind < nbNeurons; ++ind)
+    for(size_t ind = 0u; ind < nbNeurons; ++ind)
     {
         network.createNeuron();
     }

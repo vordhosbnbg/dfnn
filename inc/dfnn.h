@@ -8,6 +8,7 @@
 #include "normalized_value.h"
 
 class Neuron;
+class Archive;
 using NeuronVector = std::vector<Neuron>;
 using NeuronMapByID = std::unordered_map<Handle, Neuron *>;
 using NValueMapByID = std::unordered_map<Handle, NormalizedValue<double>>;
@@ -48,7 +49,8 @@ public:
     bool removeOutput(Handle id);
 
     void dbgPrint();
-
+    std::string save(Archive *ar);
+    void load(std::stringstream& ss, DFNN& obj, Archive *ar);
 
 
 private:

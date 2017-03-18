@@ -82,3 +82,8 @@ CHECK_CXX_COMPILER_FLAG("-pthread" HAS_FLAG_PTHREAD)
 if (HAS_FLAG_PTHREAD)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -pthread")
 endif()
+
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+  # Update if necessary
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic -Werror")
+endif()

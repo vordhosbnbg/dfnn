@@ -11,153 +11,158 @@
 class Archive
 {
 public:
-    Archive();
-    ~Archive();
+    Archive(){}
+    ~Archive(){}
 
-    template <typename T>
-    std::unique_ptr<std::string> save(T obj)
+    template <typename Key, typename T>
+    std::string save(std::pair<Key,T>& obj)
     {
-        return obj.save();
+        std::string ret;
+        ret.reserve(10);
+        ret += "PAIR\n";
+        ret += save(obj.first);
+        ret += save(obj.second);
+        return (ret);
     }
 
-    std::unique_ptr<std::string> save(int obj)
+    template <typename T>
+    std::string save(std::vector<T>& obj)
     {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
+        std::string ret;
+        std::string result;
+        std::stringstream converter;
+        converter << obj.size();
+        ret.reserve(16);
+        ret += "VEC ";
+        ret += converter.str();
+        ret += "\n";
+        for(T& item : obj)
+        {
+            result = save(item);
+            ret += result;
+        }
+
+        return (ret);
+    }
+
+    template <typename Key, typename T>
+    std::string save(std::map<Key, T>& obj)
+    {
+        std::string ret;
+        std::stringstream converter;
+        converter << obj.size();
+        ret.reserve(16);
+        ret += "MAP ";
+        ret += converter.str();
+        ret += "\n";
+        for(const std::pair<Key, T>& pair : obj)
+        {
+            ret += save(pair);
+        }
+
+        return (ret);
+    }
+
+    template <typename Key, typename T>
+    std::string save(std::unordered_map<Key,T>& obj)
+    {
+        std::string ret;
+        std::stringstream converter;
+        converter << obj.size();
+        ret.reserve(16);
+        ret += "UMAP ";
+        ret += converter.str();
+        ret += "\n";
+        for(std::pair<Key, T> pair : obj)
+        {
+            ret += save(pair);
+        }
+
+        return (ret);
+    }
+
+    template <typename T>
+    std::string save(T& obj)
+    {
+        return obj.save(this);
+    }
+
+    std::string save(int obj)
+    {
+        std::string ret;
         std::stringstream converter;
         converter << obj;
         if(!converter.fail())
         {
-            ret->reserve(16);
-            ret->append("INT ");
-            converter >> *ret;
-            ret->append("\n");
+            ret.reserve(16);
+            ret += "INT ";
+            ret += converter.str();
+            ret += "\n";
         }
 
-        return std::move(ret);
+        return (ret);
+    }
+    std::string save(long int obj)
+    {
+        return save((int)obj);
     }
 
-    std::unique_ptr<std::string> save(unsigned int obj)
+    std::string save(unsigned int obj)
     {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
+        std::string ret;
         std::stringstream converter;
         converter << std::hex << obj;
         if(!converter.fail())
         {
-            ret->reserve(16);
-            ret->append("HEX ");
-            converter >> *ret;
-            ret->append("\n");
+            ret.reserve(16);
+            ret += "HEX ";
+            ret += converter.str();
+            ret += "\n";
         }
 
-        return std::move(ret);
+        return (ret);
     }
 
-    std::unique_ptr<std::string> save(double obj)
+    std::string save(long unsigned int obj)
     {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
+        return save((unsigned int)obj);
+    }
+
+    std::string save(double obj)
+    {
+        std::string ret;
         std::stringstream converter;
         converter << std::hex << obj;
         if(!converter.fail())
         {
-            ret->reserve(20);
-            ret->append("DBL ");
-            converter >> *ret;
-            ret->append("\n");
+            ret.reserve(20);
+            ret += "DBL ";
+            ret += converter.str();
+            ret += "\n";
         }
 
-        return std::move(ret);
+        return (ret);
     }
 
-    std::unique_ptr<std::string> save(std::string obj)
+    std::string save(std::string& obj)
     {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
-        ret->reserve(30);
-        ret->append("STR ");
-        ret->append(obj);
-        ret->append("\n");
+        std::string ret;
+        ret.reserve(30);
+        ret += "STR ";
+        ret += obj;
+        ret += "\n";
 
-        return std::move(ret);
-    }
-
-    template <typename T>
-    std::unique_ptr<std::string> save(const std::vector<T>obj)
-    {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
-        std::stringstream converter;
-        converter << obj.size();
-        ret->reserve(16);
-        ret->append("VEC ");
-        ret->append(converter.str());
-        ret->append("\n");
-        for(const auto& item : obj)
-        {
-            ret->append(*item.save());
-        }
-
-        return std::move(ret);
-    }
-
-    template <typename Key, typename T>
-    std::unique_ptr<std::string> save(const std::map<Key, T>obj)
-    {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
-        std::stringstream converter;
-        converter << obj.size();
-        ret->reserve(16);
-        ret->append("MAP ");
-        ret->append(converter.str());
-        ret->append("\n");
-        for(const std::pair<Key, T>& pair : obj)
-        {
-            ret->append(*save(pair));
-        }
-
-        return std::move(ret);
-    }
-
-    template <typename Key, typename T>
-    std::unique_ptr<std::string> save(const std::unordered_map<Key,T>obj)
-    {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
-        std::stringstream converter;
-        converter << obj.size();
-        ret->reserve(16);
-        ret->append("UMAP ");
-        ret->append(converter.str());
-        ret->append("\n");
-        for(const std::pair<Key, T>& pair : obj)
-        {
-            ret->append(*save(pair));
-        }
-
-        return std::move(ret);
-    }
-
-    template <typename Key, typename T>
-    std::unique_ptr<std::string> save(const std::pair<Key,T>obj)
-    {
-        std::unique_ptr<std::string> ret = std::make_unique<std::string>();
-        ret->reserve(10);
-        ret->append("PAIR");
-        ret->append(*save(obj.first));
-        ret->append(*save(obj.second));
-        ret->append("\n");
-        for(const std::pair<Key, T>& pair : obj)
-        {
-            ret->append(*save(pair));
-        }
-
-        return std::move(ret);
+        return (ret);
     }
 
 
     template <typename T>
-    void load(std::stringstream& ss, T& obj)
+    void load(std::stringstream& ss, T& obj, Archive *ar)
     {
-        return T::load(ss);
+        obj.load(ss, obj, ar);
     }
 
-    void load(std::stringstream& ss, int& obj)
+    void load(std::stringstream& ss, int& obj, Archive *ar)
     {
         int ret = 0;
         std::string line;
@@ -170,7 +175,7 @@ public:
         obj = ret;
     }
 
-    void load(std::stringstream& ss, unsigned int& obj)
+    void load(std::stringstream& ss, unsigned int& obj, Archive *ar)
     {
         unsigned int ret = 0;
         std::string line;
@@ -183,7 +188,12 @@ public:
         obj = ret;
     }
 
-    void load(std::stringstream& ss, double& obj)
+    void load(std::stringstream& ss, long unsigned int& obj, Archive *ar)
+    {
+        load(ss, reinterpret_cast<unsigned int&>(obj), ar);
+    }
+
+    void load(std::stringstream& ss, double& obj, Archive *ar)
     {
         double ret = 0.0;
         std::string line;
@@ -196,7 +206,7 @@ public:
         obj = ret;
     }
 
-    void load(std::stringstream& ss, std::string& obj)
+    void load(std::stringstream& ss, std::string& obj, Archive *ar)
     {
         std::string line;
         std::getline(ss, line);
@@ -208,7 +218,7 @@ public:
     }
 
     template <typename T>
-    void load(std::stringstream& ss, std::vector<T>& obj)
+    void load(std::stringstream& ss, std::vector<T>& obj, Archive *ar)
     {
         size_t size;
         std::string line;
@@ -219,17 +229,17 @@ public:
             converter >> size;
             obj.clear();
             obj.reserve(size);
-            for(auto ind = 0; ind < size; ++ ind)
+            for(size_t ind = 0; ind < size; ++ ind)
             {
                 T item;
-                load(ss, item);
-                obj.emplace_back(std::move(item));
+                load(ss, item, ar);
+                obj.emplace_back((item));
             }
         }
     }
 
     template <typename Key, typename T>
-    void load(std::stringstream& ss, std::map<Key, T>& obj)
+    void load(std::stringstream& ss, std::map<Key, T>& obj, Archive *ar)
     {
         size_t size;
         std::string line;
@@ -242,42 +252,41 @@ public:
             for(auto ind = 0; ind < size; ++ ind)
             {
                 std::pair<Key, T> pair;
-                load(ss, pair);
-                obj.emplace(std::move(pair));
+                load(ss, pair, ar);
+                obj.emplace((pair));
             }
         }
     }
 
     template <typename Key, typename T>
-    void load(std::stringstream& ss, std::unordered_map<Key, T>& obj)
+    void load(std::stringstream& ss, std::unordered_map<Key, T>& obj, Archive *ar)
     {
         size_t size;
         std::string line;
         std::getline(ss, line);
-        if(line.substr(0,4) == "UMAP ")
+        if(line.substr(0,5) == "UMAP ")
         {
-            std::stringstream converter(line.substr(4));
+            std::stringstream converter(line.substr(5));
             converter >> size;
             obj.clear();
-            for(auto ind = 0; ind < size; ++ ind)
+            for(size_t ind = 0; ind < size; ++ ind)
             {
                 std::pair<Key, T> pair;
-                load(ss, pair);
-                obj.emplace(std::move(pair));
+                load(ss, pair, ar);
+                obj.emplace((pair));
             }
         }
     }
 
     template <typename Key, typename T>
-    void load(std::stringstream& ss, std::pair<Key, T>& obj)
+    void load(std::stringstream& ss, std::pair<Key, T>& obj, Archive *ar)
     {
-        double ret = 0.0;
         std::string line;
         std::getline(ss, line);
-        if(line.substr(0,4) == "PAIR ")
+        if(line.substr(0,4) == "PAIR")
         {
-            load(ss, obj.first);
-            load(ss, obj.second);
+            load(ss, obj.first, ar);
+            load(ss, obj.second, ar);
         }
     }
 
@@ -285,10 +294,12 @@ public:
     void read(const std::string& filename, T& object)
     {
         std::ifstream ifs;
+        std::stringstream ss;
         ifs.open(filename);
         if(ifs.is_open())
         {
-            load(ifs, object);
+            ss << ifs.rdbuf();
+            load(ss, object, this);
         }
     }
 
@@ -296,10 +307,11 @@ public:
     void write(const std::string& filename, T& object)
     {
         std::ofstream ofs;
+
         ofs.open(filename);
         if(ofs.is_open())
         {
-            std::string result = *save( object);
+            std::string result = save( object);
             ofs << result;
         }
     }
