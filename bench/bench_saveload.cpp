@@ -2,8 +2,8 @@
 #include "neuron.h"
 #include "file_archive.h"
 
-constexpr unsigned int nbLayer1 = 20;
-constexpr unsigned int nbLayer2 = 70;
+constexpr unsigned int nbLayer1 = 200;
+constexpr unsigned int nbLayer2 = 700;
 constexpr unsigned int nbLayer3 = 10;
 constexpr unsigned int nbNeurons = nbLayer1 + nbLayer2 + nbLayer3;
 

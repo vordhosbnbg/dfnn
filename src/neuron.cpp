@@ -92,7 +92,7 @@ void Neuron::load(std::stringstream& ss, Neuron &obj, Archive *ar)
 
 void Neuron::reconstructPointers(DFNN* parentNetwork)
 {
-    for(std::pair<double, Neuron*> pair : _outputs)
+    for(std::pair<double, Neuron*>& pair : _outputs)
     {
         unsigned long temp = reinterpret_cast<unsigned long>(pair.second);
         NeuronHandle id = static_cast<NeuronHandle>(temp);

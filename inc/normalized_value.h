@@ -9,7 +9,12 @@ class NormalizedValue
 {
 public:
 
-    NormalizedValue()
+    NormalizedValue():
+        minVal(0),
+        maxVal(100),
+        rangeVal(100),
+        reciprocalRangeVal(1 / 100),
+        normalizedValue(0)
     {
 
     }
@@ -18,7 +23,8 @@ public:
         minVal(min),
         maxVal(max),
         rangeVal(max - min),
-        reciprocalRangeVal(1 / (max - min))
+        reciprocalRangeVal(1 / (max - min)),
+        normalizedValue(0)
     {
 
     }
@@ -27,7 +33,8 @@ public:
         minVal(other.minVal),
         maxVal(other.maxVal),
         rangeVal(other.rangeVal),
-        reciprocalRangeVal(other.reciprocalRangeVal)
+        reciprocalRangeVal(other.reciprocalRangeVal),
+        normalizedValue(other.normalizedValue)
     {
 
     }
@@ -39,8 +46,8 @@ public:
 
     void updateMinMax()
     {
-        rangeVal(maxVal - minVal);
-        reciprocalRangeVal(1 / (maxVal - minVal));
+        rangeVal= maxVal - minVal;
+        reciprocalRangeVal = 1 / (maxVal - minVal);
     }
 
     T get()
@@ -96,8 +103,6 @@ public:
         ret += "NVAL\n";
         ret += ar->save(minVal);
         ret += ar->save(maxVal);
-        ret += ar->save(rangeVal);
-        ret += ar->save(reciprocalRangeVal);
         ret += ar->save(normalizedValue);
         return ret;
     }
@@ -109,9 +114,9 @@ public:
         {
             ar->load(ss, minVal, ar);
             ar->load(ss, maxVal, ar);
-            ar->load(ss, rangeVal, ar);
-            ar->load(ss, reciprocalRangeVal, ar);
+            updateMinMax();
             ar->load(ss, normalizedValue, ar);
+            setNormalized(normalizedValue);
         }
     }
 
