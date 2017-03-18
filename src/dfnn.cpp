@@ -185,8 +185,9 @@ void DFNN::load(std::stringstream& ss, DFNN &obj, Archive * ar)
     std::getline(ss, line);
     if(line.substr(0,5) == "DFNN ")
     {
-        std::stringstream converter(line.substr(4));
-        converter >> nbNeurons >> nbInputs >> nbOutputs;
+        ar->converter.str(line.substr(4));
+        ar->converter.clear();
+        ar->converter >> std::dec >> nbNeurons >> nbInputs >> nbOutputs;
         _vecNeurons.reserve(nbNeurons);
         ar->load(ss, _vecNeurons, ar);
         ar->load(ss, _mapInputs, ar);

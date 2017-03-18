@@ -55,8 +55,10 @@ void Neuron::DbgPrint(bool input, bool output) const
 std::string Neuron::save(Archive * ar)
 {
     std::stringstream& ss = ar->converter;
+    ss.clear();
+    ss.str(std::string());
     std::string ret;
-    ss << "NRN " <<  _outputs.size() << "\n";
+    ss << "NRN " << std::dec << _outputs.size() << "\n";
     ret += ss.str();
     ret += ar->save(_index);
     ret += ar->save(_id);

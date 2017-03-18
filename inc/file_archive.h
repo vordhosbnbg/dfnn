@@ -32,7 +32,7 @@ public:
         std::string result;
         converter.str(std::string());
         converter.clear();
-        converter << obj.size();
+        converter << std::dec << obj.size();
         ret.reserve(16);
         ret += "VEC ";
         ret += converter.str();
@@ -52,7 +52,7 @@ public:
         std::string ret;
         converter.str(std::string());
         converter.clear();
-        converter << obj.size();
+        converter << std::dec << obj.size();
         ret.reserve(16);
         ret += "MAP ";
         ret += converter.str();
@@ -71,7 +71,7 @@ public:
         std::string ret;
         converter.str(std::string());
         converter.clear();
-        converter << obj.size();
+        converter << std::dec << obj.size();
         ret.reserve(16);
         ret += "UMAP ";
         ret += converter.str();
@@ -95,7 +95,7 @@ public:
         std::string ret;
         converter.str(std::string());
         converter.clear();
-        converter << obj;
+        converter << std::dec << obj;
         if(!converter.fail())
         {
             ret.reserve(16);
@@ -138,7 +138,7 @@ public:
         std::string ret;
         converter.str(std::string());
         converter.clear();
-        converter << std::hex << obj;
+        converter << std::dec <<obj;
         if(!converter.fail())
         {
             ret.reserve(20);
@@ -177,7 +177,7 @@ public:
         {
             converter.str(line.substr(4));
             converter.clear();
-            converter >> ret;
+            converter >> std::dec >> ret;
         }
         obj = ret;
     }
@@ -210,7 +210,7 @@ public:
         {
             converter.str(line.substr(4));
             converter.clear();
-            converter >> ret;
+            converter >> std::dec >> ret;
         }
         obj = ret;
     }
@@ -237,7 +237,7 @@ public:
         {
             converter.str(line.substr(4));
             converter.clear();
-            converter >> size;
+            converter >> std::dec >> size;
             obj.clear();
             obj.reserve(size);
             for(size_t ind = 0; ind < size; ++ ind)
@@ -259,7 +259,7 @@ public:
         {
             converter.str(line.substr(4));
             converter.clear();
-            converter >> size;
+            converter >> std::dec >> size;
             obj.clear();
             for(auto ind = 0; ind < size; ++ ind)
             {
@@ -280,7 +280,7 @@ public:
         {
             converter.str(line.substr(5));
             converter.clear();
-            converter >> size;
+            converter >> std::dec >> size;
             obj.clear();
             for(size_t ind = 0; ind < size; ++ ind)
             {
