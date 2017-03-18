@@ -30,7 +30,8 @@ public:
     {
         std::string ret;
         std::string result;
-        std::stringstream converter;
+        converter.str(std::string());
+        converter.clear();
         converter << obj.size();
         ret.reserve(16);
         ret += "VEC ";
@@ -49,7 +50,8 @@ public:
     std::string save(std::map<Key, T>& obj)
     {
         std::string ret;
-        std::stringstream converter;
+        converter.str(std::string());
+        converter.clear();
         converter << obj.size();
         ret.reserve(16);
         ret += "MAP ";
@@ -67,7 +69,8 @@ public:
     std::string save(std::unordered_map<Key,T>& obj)
     {
         std::string ret;
-        std::stringstream converter;
+        converter.str(std::string());
+        converter.clear();
         converter << obj.size();
         ret.reserve(16);
         ret += "UMAP ";
@@ -90,7 +93,8 @@ public:
     std::string save(int obj)
     {
         std::string ret;
-        std::stringstream converter;
+        converter.str(std::string());
+        converter.clear();
         converter << obj;
         if(!converter.fail())
         {
@@ -110,7 +114,8 @@ public:
     std::string save(unsigned int obj)
     {
         std::string ret;
-        std::stringstream converter;
+        converter.str(std::string());
+        converter.clear();
         converter << std::hex << obj;
         if(!converter.fail())
         {
@@ -131,7 +136,8 @@ public:
     std::string save(double obj)
     {
         std::string ret;
-        std::stringstream converter;
+        converter.str(std::string());
+        converter.clear();
         converter << std::hex << obj;
         if(!converter.fail())
         {
@@ -169,7 +175,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,4) == "INT ")
         {
-            std::stringstream converter(line.substr(4));
+            converter.str(line.substr(4));
+            converter.clear();
             converter >> ret;
         }
         obj = ret;
@@ -182,7 +189,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,4) == "HEX ")
         {
-            std::stringstream converter(line.substr(4));
+            converter.str(line.substr(4));
+            converter.clear();
             converter >> std::hex >> ret;
         }
         obj = ret;
@@ -200,7 +208,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,4) == "DBL ")
         {
-            std::stringstream converter(line.substr(4));
+            converter.str(line.substr(4));
+            converter.clear();
             converter >> ret;
         }
         obj = ret;
@@ -212,7 +221,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,4) == "STR ")
         {
-            std::stringstream converter(line.substr(4));
+            converter.str(line.substr(4));
+            converter.clear();
             converter >> obj;
         }
     }
@@ -225,7 +235,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,4) == "VEC ")
         {
-            std::stringstream converter(line.substr(4));
+            converter.str(line.substr(4));
+            converter.clear();
             converter >> size;
             obj.clear();
             obj.reserve(size);
@@ -246,7 +257,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,4) == "MAP ")
         {
-            std::stringstream converter(line.substr(4));
+            converter.str(line.substr(4));
+            converter.clear();
             converter >> size;
             obj.clear();
             for(auto ind = 0; ind < size; ++ ind)
@@ -266,7 +278,8 @@ public:
         std::getline(ss, line);
         if(line.substr(0,5) == "UMAP ")
         {
-            std::stringstream converter(line.substr(5));
+            converter.str(line.substr(5));
+            converter.clear();
             converter >> size;
             obj.clear();
             for(size_t ind = 0; ind < size; ++ ind)
@@ -316,4 +329,5 @@ public:
         }
     }
 
+    std::stringstream converter;
 };

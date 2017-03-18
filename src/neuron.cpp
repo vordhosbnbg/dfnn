@@ -54,7 +54,7 @@ void Neuron::DbgPrint(bool input, bool output) const
 
 std::string Neuron::save(Archive * ar)
 {
-    std::stringstream ss;
+    std::stringstream& ss = ar->converter;
     std::string ret;
     ss << "NRN " <<  _outputs.size() << "\n";
     ret += ss.str();
@@ -63,6 +63,7 @@ std::string Neuron::save(Archive * ar)
     ret += ar->save(_accumulator);
     ret += ar->save(_charge);
     std::vector<std::pair<double, NeuronHandle>> tempVec;
+    tempVec.reserve(_outputs.size());
     for(const std::pair<double, Neuron*>& item : _outputs)
     {
         tempVec.emplace_back(std::make_pair(item.first, item.second->getID()));
